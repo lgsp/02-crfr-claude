@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fonctions de Référence — Seconde</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<!-- MathJax configuration: render \( \) inline and \[ \] display -->
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)']],
+      displayMath: [['\\[', '\\]']],
+      packages: {'[+]': ['noerrors']}
+    },
+    options: {
+      skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+    },
+    startup: {
+      ready() {
+        MathJax.startup.defaultReady();
+      }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+<link rel="stylesheet" href="./css/styles.css">
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="badge">Seconde — Chapitre F · Fonctions</div>
+  <h1>Fonctions de Référence</h1>
+  <p>Carré, inverse, racine carrée, cube : définitions, courbes, comparaisons et exercices interactifs.</p>
+  <div class="hero-nav">
+    <a class="nav-pill active" href="#definitions">Définitions</a>
+    <a class="nav-pill" href="#comparaison">Comparaison</a>
+    <a class="nav-pill" href="#position">Position relative</a>
+    <a class="nav-pill" href="#equations">Équations</a>
+    <a class="nav-pill" href="#qcm">QCM</a>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- SECTION 1 : DÉFINITIONS & COURBES               -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <section id="definitions">
+    <div class="section-header">
+      <span class="section-num">01 — Contenus</span>
+      <h2 class="section-title">Les quatre fonctions de référence</h2>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:20px">
+      <div class="func-card" id="card-square"></div>
+      <div class="func-card" id="card-inverse"></div>
+    </div>
+    <div class="grid-2">
+      <div class="func-card" id="card-sqrt"></div>
+      <div class="func-card" id="card-cube"></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- SECTION 2 : COMPARAISON f(a) vs f(b)            -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <section id="comparaison">
+    <div class="section-header">
+      <span class="section-num">02 — Capacité attendue</span>
+      <h2 class="section-title">Comparer f(a) et f(b)</h2>
+    </div>
+
+    <div class="highlight-box">
+      <h4>Méthode</h4>
+      <p>Pour deux réels \(a\) et \(b\) et une fonction de référence \(f\), on peut comparer \(f(a)\) et \(f(b)\) :
+      <br>• <strong>Numériquement</strong> : calculer les images et comparer les valeurs.
+      <br>• <strong>Graphiquement</strong> : lire les ordonnées des points de la courbe d'abscisses \(a\) et \(b\).
+      <br>• <strong>Par les variations</strong> : utiliser le sens de variation de la fonction sur l'intervalle considéré.</p>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom:18px;font-family:'Playfair Display',serif;">Outil interactif — choisir a et b</h3>
+      <div class="tabs" id="compare-tabs">
+        <button class="tab active" data-func="square">x²</button>
+        <button class="tab" data-func="inverse">1/x</button>
+        <button class="tab" data-func="sqrt">√x</button>
+        <button class="tab" data-func="cube">x³</button>
+      </div>
+      <div class="demo-controls">
+        <div class="slider-row">
+          <label>a =</label>
+          <input type="range" id="slider-a" min="-4" max="4" step="0.1" value="-2">
+          <span class="slider-val" id="val-a">−2</span>
+        </div>
+        <div class="slider-row">
+          <label>b =</label>
+          <input type="range" id="slider-b" min="-4" max="4" step="0.1" value="1.5">
+          <span class="slider-val" id="val-b">1.5</span>
+        </div>
+      </div>
+      <div id="compare-canvas-wrap"><canvas id="compare-canvas"></canvas></div>
+      <div id="compare-result" style="margin-top:14px;font-family:'DM Mono',monospace;font-size:14px;padding:12px 16px;background:var(--bg3);border-radius:8px;line-height:1.8;"></div>
+    </div>
+
+    <!-- Tableau des variations -->
+    <div style="margin-top:20px">
+      <h3 style="font-family:'Playfair Display',serif;margin-bottom:16px;">Tableaux de variations</h3>
+      <div class="grid-2">
+        <div class="card">
+          <h4 style="color:var(--accent1);font-family:'DM Mono',monospace;margin-bottom:12px;">\(f(x) = x^2\)</h4>
+          <table>
+            <thead><tr><th>x</th><th>\(-\infty\)</th><th></th><th>\(0\)</th><th></th><th>\(+\infty\)</th></tr></thead>
+            <tbody>
+              <tr><td>\(f(x)\)</td><td>\(+\infty\)</td><td>↘</td><td class="zero">\(0\)</td><td>↗</td><td>\(+\infty\)</td></tr>
+            </tbody>
+          </table>
+          <p style="font-size:12px;color:var(--muted);margin-top:10px;">Décroissante sur \(]-\infty\,;\,0]\), croissante sur \([0\,;\,+\infty[\)</p>
+        </div>
+        <div class="card">
+          <h4 style="color:var(--accent2);font-family:'DM Mono',monospace;margin-bottom:12px;">\(f(x) = \tfrac{1}{x}\)</h4>
+          <table>
+            <thead><tr><th>x</th><th>\(-\infty\)</th><th></th><th>\(0\)</th><th></th><th>\(+\infty\)</th></tr></thead>
+            <tbody>
+              <tr><td>\(f(x)\)</td><td>\(0^-\)</td><td>↗</td><td>‖</td><td>↗</td><td>\(0^+\)</td></tr>
+            </tbody>
+          </table>
+          <p style="font-size:12px;color:var(--muted);margin-top:10px;">Décroissante sur \(]-\infty\,;\,0[\) et sur \(]0\,;\,+\infty[\) · Non définie en \(0\)</p>
+        </div>
+        <div class="card">
+          <h4 style="color:var(--accent3);font-family:'DM Mono',monospace;margin-bottom:12px;">\(f(x) = \sqrt{x}\)</h4>
+          <table>
+            <thead><tr><th>x</th><th>\(0\)</th><th></th><th>\(+\infty\)</th></tr></thead>
+            <tbody>
+              <tr><td>\(f(x)\)</td><td class="zero">\(0\)</td><td>↗</td><td>\(+\infty\)</td></tr>
+            </tbody>
+          </table>
+          <p style="font-size:12px;color:var(--muted);margin-top:10px;">Croissante sur \([0\,;\,+\infty[\) · Définie sur \([0\,;\,+\infty[\)</p>
+        </div>
+        <div class="card">
+          <h4 style="color:var(--accent4);font-family:'DM Mono',monospace;margin-bottom:12px;">\(f(x) = x^3\)</h4>
+          <table>
+            <thead><tr><th>x</th><th>\(-\infty\)</th><th></th><th>\(+\infty\)</th></tr></thead>
+            <tbody>
+              <tr><td>\(f(x)\)</td><td>\(-\infty\)</td><td>↗</td><td>\(+\infty\)</td></tr>
+            </tbody>
+          </table>
+          <p style="font-size:12px;color:var(--muted);margin-top:10px;">Croissante sur \(\mathbb{R}\) · \(f(-x) = -f(x)\) (fonction impaire)</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- SECTION 3 : POSITION RELATIVE                   -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <section id="position">
+    <div class="section-header">
+      <span class="section-num">03 — Démonstration</span>
+      <h2 class="section-title">Position relative de y=x, y=x², y=x³</h2>
+    </div>
+
+    <div class="highlight-box">
+      <h4>Théorème — pour \(x \geq 0\)</h4>
+      <p>
+        • Si \(0 \leq x \leq 1\) : \(x^3 \leq x^2 \leq x\)<br>
+        • Si \(x = 1\) : \(x^3 = x^2 = x = 1\)<br>
+        • Si \(x > 1\) : \(x < x^2 < x^3\)
+      </p>
+    </div>
+
+    <div class="pos-relative-box">
+      <div class="card">
+        <div class="legend">
+          <div class="legend-item"><div class="legend-line" style="background:#f7c948"></div><span>\(y = x\)</span></div>
+          <div class="legend-item"><div class="legend-line" style="background:#e05a5a"></div><span>\(y = x^2\)</span></div>
+          <div class="legend-item"><div class="legend-line" style="background:#6be05a"></div><span>\(y = x^3\)</span></div>
+        </div>
+        <div id="pos-canvas-wrap"><canvas id="pos-canvas"></canvas></div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:16px;">
+          <h4 style="margin-bottom:12px;font-family:'DM Mono',monospace;color:var(--accent1);">Tester un \(x \geq 0\)</h4>
+          <div class="interval-control">
+            <label>Valeur de x</label>
+            <input type="number" class="x-input" id="pos-x-input" value="0.5" min="0" max="3" step="0.05">
+          </div>
+          <div id="pos-result" style="font-family:'DM Mono',monospace;font-size:13px;line-height:2;"></div>
+        </div>
+        <div class="card">
+          <h4 style="margin-bottom:12px;font-family:'Playfair Display',serif;">Preuve</h4>
+          <p style="font-size:13px;color:#aaa;line-height:1.8;">
+            Pour \(x \geq 1\), on a \(x \geq 1\) donc :<br>
+            \(x^2 = x \cdot x \geq 1 \cdot x = x\)<br>
+            \(x^3 = x \cdot x^2 \geq 1 \cdot x^2 = x^2\)<br>
+            Donc \(x \leq x^2 \leq x^3\).
+          </p>
+          <p style="font-size:13px;color:#aaa;line-height:1.8;margin-top:10px;">
+            Pour \(0 \leq x \leq 1\), on a \(x \leq 1\) donc :<br>
+            \(x^2 = x \cdot x \leq 1 \cdot x = x\)<br>
+            \(x^3 = x \cdot x^2 \leq 1 \cdot x^2 = x^2\)<br>
+            Donc \(x^3 \leq x^2 \leq x\).
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- SECTION 4 : ÉQUATIONS & INÉQUATIONS             -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <section id="equations">
+    <div class="section-header">
+      <span class="section-num">04 — Capacité attendue</span>
+      <h2 class="section-title">Résoudre f(x) = k et f(x) &lt; k</h2>
+    </div>
+
+    <div class="card" style="margin-bottom:20px;">
+      <div class="tabs" id="eq-tabs">
+        <button class="tab active" data-eq="square">x²</button>
+        <button class="tab" data-eq="sqrt">√x</button>
+        <button class="tab" data-eq="inverse">1/x</button>
+        <button class="tab" data-eq="cube">x³</button>
+      </div>
+      <div class="demo-controls">
+        <div class="slider-row">
+          <label>k =</label>
+          <input type="range" id="slider-k" min="-4" max="6" step="0.25" value="2">
+          <span class="slider-val" id="val-k">2</span>
+        </div>
+      </div>
+      <div id="eq-canvas-wrap" style="height:300px;"><canvas id="eq-canvas"></canvas></div>
+      <div id="eq-result" style="margin-top:14px;font-family:'DM Mono',monospace;font-size:13px;padding:14px 16px;background:var(--bg3);border-radius:8px;line-height:2;"></div>
+    </div>
+
+    <!-- Tableau récapitulatif algébrique -->
+    <div class="card">
+      <h3 style="margin-bottom:16px;font-family:'Playfair Display',serif;">Tableau récapitulatif — résolution algébrique</h3>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Équation</th>
+              <th>Condition</th>
+              <th>Solutions</th>
+              <th>Inéquation \(f(x) < k\)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>\(x^2 = k\)</td>
+              <td>\(k \geq 0\)</td>
+              <td class="pos">\(x = \sqrt{k}\) ou \(x = -\sqrt{k}\)</td>
+              <td>\(-\sqrt{k} < x < \sqrt{k}\) si \(k>0\)</td>
+            </tr>
+            <tr>
+              <td>\(x^2 = k\)</td>
+              <td>\(k < 0\)</td>
+              <td class="neg">Aucune solution</td>
+              <td>\(\mathbb{R}\) tout entier</td>
+            </tr>
+            <tr>
+              <td>\(\sqrt{x} = k\)</td>
+              <td>\(k \geq 0\)</td>
+              <td class="pos">\(x = k^2\)</td>
+              <td>\(0 \leq x < k^2\)</td>
+            </tr>
+            <tr>
+              <td>\(\sqrt{x} = k\)</td>
+              <td>\(k < 0\)</td>
+              <td class="neg">Aucune solution</td>
+              <td>\(\varnothing\)</td>
+            </tr>
+            <tr>
+              <td>\(\dfrac{1}{x} = k\)</td>
+              <td>\(k \neq 0\)</td>
+              <td class="pos">\(x = \dfrac{1}{k}\)</td>
+              <td>Dépend du signe de \(k\)</td>
+            </tr>
+            <tr>
+              <td>\(x^3 = k\)</td>
+              <td>\(k \in \mathbb{R}\)</td>
+              <td class="pos">\(x = \sqrt[3]{k}\)</td>
+              <td>\(x < \sqrt[3]{k}\)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- SECTION 5 : QCM                                 -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <section id="qcm">
+    <div class="section-header">
+      <span class="section-num">05 — S'entraîner</span>
+      <h2 class="section-title">QCM interactif</h2>
+    </div>
+
+    <div class="qcm-section">
+      <div class="qcm-header">
+        <div>
+          <h3 style="font-family:'Playfair Display',serif;margin-bottom:4px;">Questions aléatoires</h3>
+          <p style="font-size:13px;color:var(--muted);">Sélectionne la bonne réponse · Les valeurs changent à chaque rechargement</p>
+        </div>
+        <div class="qcm-score">
+          <div>
+            <div class="score-badge" id="score-display">0 / 0</div>
+            <div class="progress-bar" style="margin-top:6px;width:120px"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+          </div>
+          <button class="btn" onclick="regenerateQCM()">Nouveau QCM ↻</button>
+        </div>
+      </div>
+      <div class="questions-grid" id="questions-container"></div>
+      <div class="refresh-hint">Les valeurs numériques sont générées aléatoirement — rafraîchis la page ou clique sur "Nouveau QCM" pour de nouveaux exercices.</div>
+    </div>
+  </section>
+
+</div><!-- /container -->
+
+<script src="./js/main.js"></script>
+</body>
+</html>
