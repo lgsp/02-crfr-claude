@@ -2,6 +2,15 @@
 // UTILITY
 // ═══════════════════════════════════════════════════
 
+/**
+ * Couleurs des graphiques — initialisées depuis les variables CSS dans DOMContentLoaded.
+ * Centralise la source de vérité : plus de valeurs dupliquées dans tout le fichier.
+ */
+const CHART_COLORS = {
+  grid:  '#1a2235',  // var(--bg3)   — valeur par défaut avant lecture CSS
+  ticks: '#6b7a99',  // var(--muted) — valeur par défaut avant lecture CSS
+};
+
 /** Pick a random element from array */
 const pick = arr => arr[Math.floor(Math.random() * arr.length)];
 
@@ -174,10 +183,20 @@ function buildFuncCard(containerId, key) {
   requestAnimationFrame(() => drawMiniChart(key));
 }
 
+// Registre des instances mini-charts pour pouvoir les détruire avant recréation
+const miniChartInstances = {};
+
 function drawMiniChart(key) {
   const f = FUNCS[key];
   const canvas = document.getElementById(`mini-${key}`);
   if (!canvas) return;
+
+  // Détruire l'instance précédente si elle existe (évite l'empilement d'instances)
+  if (miniChartInstances[key]) {
+    miniChartInstances[key].destroy();
+    miniChartInstances[key] = null;
+  }
+
   const ctx = canvas.getContext('2d');
   const [xMin, xMax] = f.xRange;
   const [yMin, yMax] = f.yRange;
@@ -196,15 +215,15 @@ function drawMiniChart(key) {
     datasets.push({ data, borderColor: f.color, borderWidth: 2.5, pointRadius: 0, tension: 0.4, fill: false });
   }
 
-  new Chart(ctx, {
+  miniChartInstances[key] = new Chart(ctx, {
     type: 'scatter',
     data: { datasets },
     options: {
       animation: false,
       plugins: { legend: { display: false }, tooltip: { enabled: false } },
       scales: {
-        x: { type: 'linear', min: xMin, max: xMax, grid: { color: '#1a2235' }, ticks: { color: '#6b7a99', font: { size: 10 }, maxTicksLimit: 7 } },
-        y: { type: 'linear', min: yMin, max: yMax, grid: { color: '#1a2235' }, ticks: { color: '#6b7a99', font: { size: 10 }, maxTicksLimit: 7 } }
+        x: { type: 'linear', min: xMin, max: xMax, grid: { color: CHART_COLORS.grid }, ticks: { color: CHART_COLORS.ticks, font: { size: 10 }, maxTicksLimit: 7 } },
+        y: { type: 'linear', min: yMin, max: yMax, grid: { color: CHART_COLORS.grid }, ticks: { color: CHART_COLORS.ticks, font: { size: 10 }, maxTicksLimit: 7 } }
       },
       responsive: true,
       maintainAspectRatio: false,
@@ -218,6 +237,8 @@ function drawMiniChart(key) {
 // ═══════════════════════════════════════════════════
 let compareChart = null;
 let currentCompareFunc = 'square';
+// Cache des points x pour éviter de recalculer linspace à chaque interaction slider
+let _compareXCache = { key: null, pts: null };
 
 function initCompare() {
   const canvas = document.getElementById('compare-canvas');
@@ -229,8 +250,8 @@ function initCompare() {
       animation: false,
       plugins: { legend: { display: false }, tooltip: { enabled: false } },
       scales: {
-        x: { type: 'linear', grid: { color: '#1a2235' }, ticks: { color: '#6b7a99' } },
-        y: { type: 'linear', grid: { color: '#1a2235' }, ticks: { color: '#6b7a99' } }
+        x: { type: 'linear', grid: { color: CHART_COLORS.grid }, ticks: { color: CHART_COLORS.ticks } },
+        y: { type: 'linear', grid: { color: CHART_COLORS.grid }, ticks: { color: CHART_COLORS.ticks } }
       },
       responsive: true, maintainAspectRatio: false, showLine: true
     }
@@ -246,7 +267,12 @@ function updateCompare() {
   document.getElementById('val-b').textContent = fmt(b);
 
   const [xMin, xMax] = f.xRange;
-  const pts = linspace(xMin, xMax, 400);
+  // Recalculer les points seulement si la fonction a changé
+  if (_compareXCache.key !== currentCompareFunc) {
+    _compareXCache.key = currentCompareFunc;
+    _compareXCache.pts = linspace(xMin, xMax, 400);
+  }
+  const pts = _compareXCache.pts;
   const line = pts.map(x => ({ x, y: f.fn(x) })).filter(p => p.y !== null && p.y > f.yRange[0] && p.y < f.yRange[1]);
 
   const fa = f.fn(a); const fb = f.fn(b);
@@ -300,8 +326,8 @@ function initPosChart() {
       animation: false,
       plugins: { legend: { display: false }, tooltip: { enabled: false } },
       scales: {
-        x: { type: 'linear', min: 0, max: 2.2, grid: { color: '#1a2235' }, ticks: { color: '#6b7a99' } },
-        y: { type: 'linear', min: 0, max: 6,   grid: { color: '#1a2235' }, ticks: { color: '#6b7a99' } }
+        x: { type: 'linear', min: 0, max: 2.2, grid: { color: CHART_COLORS.grid }, ticks: { color: CHART_COLORS.ticks } },
+        y: { type: 'linear', min: 0, max: 6,   grid: { color: CHART_COLORS.grid }, ticks: { color: CHART_COLORS.ticks } }
       },
       responsive: true, maintainAspectRatio: false, showLine: true
     }
@@ -337,6 +363,8 @@ function updatePosResult() {
 // ═══════════════════════════════════════════════════
 let eqChart = null;
 let currentEqFunc = 'square';
+// Cache des points x pour éviter de recalculer linspace à chaque déplacement du slider k
+let _eqXCache = { key: null, pts: null };
 
 function initEqChart() {
   const ctx = document.getElementById('eq-canvas').getContext('2d');
@@ -347,8 +375,8 @@ function initEqChart() {
       animation: false,
       plugins: { legend: { display: false }, tooltip: { enabled: false } },
       scales: {
-        x: { type: 'linear', grid: { color: '#1a2235' }, ticks: { color: '#6b7a99' } },
-        y: { type: 'linear', grid: { color: '#1a2235' }, ticks: { color: '#6b7a99' } }
+        x: { type: 'linear', grid: { color: CHART_COLORS.grid }, ticks: { color: CHART_COLORS.ticks } },
+        y: { type: 'linear', grid: { color: CHART_COLORS.grid }, ticks: { color: CHART_COLORS.ticks } }
       },
       responsive: true, maintainAspectRatio: false, showLine: true
     }
@@ -363,7 +391,12 @@ function updateEqChart() {
 
   const [xMin, xMax] = f.xRange;
   const [yMin, yMax] = f.yRange;
-  const pts = linspace(xMin, xMax, 400);
+  // Recalculer les points seulement si la fonction a changé
+  if (_eqXCache.key !== currentEqFunc) {
+    _eqXCache.key = currentEqFunc;
+    _eqXCache.pts = linspace(xMin, xMax, 400);
+  }
+  const pts = _eqXCache.pts;
 
   let datasets = [];
   if (currentEqFunc === 'inverse') {
@@ -421,7 +454,7 @@ function updateEqChart() {
     html += `<span style="color:var(--accent3)">\\(x \\in \\mathopen]-\\infty\\,;\\,${s}[\\)</span>`;
   }
   res.innerHTML = html;
-  if (window.MathJax) MathJax.typesetPromise([res]);
+  if (window.MathJax) MathJax.typesetPromise([res]).catch(err => console.warn('MathJax:', err));
 }
 
 // ═══════════════════════════════════════════════════
@@ -772,7 +805,9 @@ function renderQCM(questions) {
 
     const labels = ['A', 'B', 'C', 'D'];
     const optsHTML = q.opts.map((opt, oi) => `
-      <div class="option" data-qi="${qi}" data-oi="${oi}">
+      <div class="option" role="button" tabindex="0"
+           aria-label="Option ${labels[oi]}"
+           data-qi="${qi}" data-oi="${oi}">
         <span class="option-label">${labels[oi]}</span>
         <span class="option-content">${opt}</span>
       </div>`).join('');
@@ -785,7 +820,21 @@ function renderQCM(questions) {
   });
 
   container.querySelectorAll('.option').forEach(opt => {
-    opt.addEventListener('click', function () {
+    // Clic souris
+    opt.addEventListener('click', handleOptionSelect);
+    // Navigation clavier : Entrée ou Espace déclenchent la sélection
+    opt.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        handleOptionSelect.call(opt, e);
+      }
+    });
+  });
+
+  if (window.MathJax) MathJax.typesetPromise([container]).catch(err => console.warn('MathJax:', err));
+
+  // ── Gestionnaire de sélection d'une option (réutilisable clavier + souris) ──
+  function handleOptionSelect() {
       const qi = parseInt(this.dataset.qi);
       const oi = parseInt(this.dataset.oi);
       const block = container.querySelector(`.question-block[data-qi="${qi}"]`);
@@ -795,7 +844,10 @@ function renderQCM(questions) {
 
       const q = questions[qi];
       const allOpts = block.querySelectorAll('.option');
-      allOpts.forEach(o => o.classList.add('locked'));
+      allOpts.forEach(o => {
+        o.classList.add('locked');
+        o.setAttribute('tabindex', '-1'); // retirer du focus une fois répondu
+      });
 
       if (oi === q.correctIndex) {
         this.classList.add('correct');
@@ -807,11 +859,62 @@ function renderQCM(questions) {
       const explEl = document.getElementById(`expl-${qi}`);
       explEl.classList.add('show');
       updateScore();
-      if (window.MathJax) MathJax.typesetPromise([explEl]);
-    });
-  });
+      if (window.MathJax) MathJax.typesetPromise([explEl]).catch(err => console.warn('MathJax:', err));
+  }
+}
 
-  if (window.MathJax) MathJax.typesetPromise([container]);
+// ═══════════════════════════════════════════════════
+// CHRONO
+// ═══════════════════════════════════════════════════
+let timerSeconds = 0;
+let timerRunning = false;
+let timerVisible = true;
+let timerInterval = null;
+
+function formatTime(s) {
+  const m = Math.floor(s / 60).toString().padStart(2, '0');
+  const sec = (s % 60).toString().padStart(2, '0');
+  return `${m}:${sec}`;
+}
+
+function startTimer() {
+  if (timerInterval) return;
+  timerRunning = true;
+  timerInterval = setInterval(() => {
+    timerSeconds++;
+    document.getElementById('timer-display').textContent = formatTime(timerSeconds);
+  }, 1000);
+  const btnPause = document.getElementById('btn-pause');
+  btnPause.textContent = '⏸ Pause';
+  btnPause.classList.remove('paused');
+}
+
+function pauseTimer() {
+  clearInterval(timerInterval);
+  timerInterval = null;
+  timerRunning = false;
+  const btnPause = document.getElementById('btn-pause');
+  btnPause.textContent = '▶ Reprendre';
+  btnPause.classList.add('paused');
+}
+
+function resetTimer() {
+  pauseTimer();
+  timerSeconds = 0;
+  document.getElementById('timer-display').textContent = formatTime(0);
+}
+
+function initTimer() {
+  document.getElementById('btn-pause').addEventListener('click', () => {
+    timerRunning ? pauseTimer() : startTimer();
+  });
+  document.getElementById('btn-reset-timer').addEventListener('click', resetTimer);
+  document.getElementById('btn-toggle-timer').addEventListener('click', () => {
+    timerVisible = !timerVisible;
+    const display = document.getElementById('timer-display');
+    display.classList.toggle('hidden-timer', !timerVisible);
+    document.getElementById('btn-toggle-timer').textContent = timerVisible ? '👁 Masquer' : '👁 Afficher';
+  });
 }
 
 function updateScore() {
@@ -821,6 +924,9 @@ function updateScore() {
 }
 
 function regenerateQCM() {
+  // Remettre le chrono à zéro et le relancer pour le nouveau QCM
+  resetTimer();
+  startTimer();
   renderQCM(generateQuestions(6));
 }
 
@@ -828,18 +934,27 @@ function regenerateQCM() {
 // INIT
 // ═══════════════════════════════════════════════════
 window.addEventListener('DOMContentLoaded', () => {
+  // ── Lire les couleurs depuis les variables CSS (source unique de vérité) ──
+  const cssVars = getComputedStyle(document.documentElement);
+  CHART_COLORS.grid   = cssVars.getPropertyValue('--bg3').trim()   || '#1a2235';
+  CHART_COLORS.ticks  = cssVars.getPropertyValue('--muted').trim() || '#6b7a99';
+
   buildFuncCard('card-square', 'square');
   buildFuncCard('card-inverse', 'inverse');
   buildFuncCard('card-sqrt', 'sqrt');
   buildFuncCard('card-cube', 'cube');
 
-  setTimeout(() => {
-    initCompare();
-    initPosChart();
-    initEqChart();
-    regenerateQCM();
-    if (window.MathJax) MathJax.typesetPromise();
-  }, 300);
+  // Attendre que Chart.js ait dimensionné les canvas via requestAnimationFrame
+  // (plus fiable que setTimeout arbitraire)
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      initCompare();
+      initPosChart();
+      initEqChart();
+      regenerateQCM();
+      if (window.MathJax) MathJax.typesetPromise().catch(err => console.warn('MathJax init:', err));
+    });
+  });
 
   document.getElementById('slider-a').addEventListener('input', updateCompare);
   document.getElementById('slider-b').addEventListener('input', updateCompare);
@@ -865,6 +980,9 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // ── Bouton Nouveau QCM (plus d'onclick inline) ──
+  document.getElementById('btn-new-qcm').addEventListener('click', regenerateQCM);
+
   document.querySelectorAll('.nav-pill').forEach(pill => {
     pill.addEventListener('click', e => {
       e.preventDefault();
@@ -874,4 +992,7 @@ window.addEventListener('DOMContentLoaded', () => {
       document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
   });
+
+  // ── Chrono ──
+  initTimer();
 });
